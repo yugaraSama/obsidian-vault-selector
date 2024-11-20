@@ -39,3 +39,8 @@ Obsidian Vault Selector is a simple yet powerful application that allows you to 
    ```bash
    npm start
    ```
+
+
+## Pictures
+![image](https://github.com/user-attachments/assets/7fba8fcc-d8a3-4e3e-b7d4-9f550c54154b)
+
