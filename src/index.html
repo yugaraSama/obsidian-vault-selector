@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vault Selector</title>
+    <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Select a Vault</h1>
+        <div id="loading-message">Loading vaults...</div>
+        <div class="card-list" id="card-list">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+    <script>
+      (async () => {
+          const loadingMessage = document.getElementById("loading-message");
+          const cardList = document.getElementById("card-list");
+  
+          try {
+              // Access the exposed API to get vaults
+              const vaults = await window.myApi.getVaults();
+              console.log("Vaults:", vaults);
+  
+              // Clear the loading message
+              loadingMessage.style.display = "none";
+  
+              // Check if vaults is an object
+              if (typeof vaults !== 'object' || vaults === null) {
+                  const errorMessage = document.createElement("div");
+                  errorMessage.style.color = "red";
+                  errorMessage.textContent = "Unexpected response format. Please check the API.";
+                  cardList.appendChild(errorMessage);
+                  return;
+              }
+  
+              // Convert the vaults object to an array of entries
+              const vaultEntries = Object.entries(vaults);
+  
+              // Check if vaults were found
+              if (vaultEntries.length === 0) {
+                  const errorMessage = document.createElement("div");
+                  errorMessage.style.color = "red";
+                  errorMessage.textContent = "No vaults found or error reading the config file.";
+                  cardList.appendChild(errorMessage);
+                  return;
+              }
+  
+              // Create UI elements for each vault
+              vaultEntries.forEach(([key, vault]) => {
+                  const card = document.createElement("div");
+                  card.className = "card";
+                  card.innerHTML = `<h2>${vault.path.split('/').pop()}</h2><p>${vault.path}</p>`;
+                  
+                  // Add click event listener to the card
+                  card.addEventListener('click', () => {
+                      // Call a function to handle the click
+                      handleVaultClick(key); // Use the actual key from the vaults object
+                  });
+  
+                  cardList.appendChild(card);
+              });
+          } catch (error) {
+              console.error("Error fetching vaults:", error);
+              loadingMessage.textContent = "Error loading vaults.";
+          }
+      })();
+  
+      // Function to handle vault click
+      function handleVaultClick(vaultKey) {
+          const obsidianUrl = `obsidian://open?vault=${vaultKey}`;
+          console.log("Opening vault:", obsidianUrl);
+          
+          // Open the Obsidian vault
+          window.location.href = obsidianUrl; // This will navigate to the Obsidian URL
+          
+          // Attempt to close the window/app
+          setTimeout(() => {
+              window.close(); // Attempt to close the window
+          }, 1000); // Delay to ensure the URL has time to process
+      }
+  </script>
+</body>
+</html>
